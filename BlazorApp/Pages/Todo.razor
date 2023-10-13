@@ -10,16 +10,19 @@
 </ul>
 
 <!-- [9] EditForm -->
-<EditForm> <!-- [9] Model="DTOModel" OnValidSubmit="PlaceTodo"   now bind-value-->
-    <input @bind-value="NewTodo" @bind:event="oninput" placeholder="What do you need to do?" />
-    <input @bind-value="DueDate" @bind:format="yyyy-MM-dd" placeholder="Due Date" />
+<!--EditForm--> <!-- [9] Model="DTOModel" OnValidSubmit="PlaceTodo"   now bind-value-->
+<form>
+    <input @bind="NewTodo" @bind:event="oninput" placeholder="What do you need to do?" />
+    <input @bind="DueDate" @bind:format="yyyy-MM-dd" placeholder="Due Date" />
+    <!--@bind-value-->
     <!-- [9] ValidationMessage For=@(() => DueDate)-->
     <button @onclick="Save">Save</button>
+</form>
     <!-- [10] Validation-->
     <!--DataAnnotationsValidator-->
     <!--[10] Go see Validation Message on line 16-->
     <!--ValidationSummary-->
-</EditForm>
+<!--/!--EditForm-->
 
 @if(!string.IsNullOrEmpty(NewTodo))
 {
