@@ -3,16 +3,33 @@
 @page "/counter/{startingvalue:int}"
 @page "/dothestuff"
 @layout MainLayout
+@inject CounterState counterState
 
 <PageTitle>Counter</PageTitle>
-
 <h1>Counter</h1>
 
 <p role="status">Current count: @currentCount</p>
+<!-- [6] Event handlers-->
+<p @onclick="Toggle">click on me</p>
+
+@if(IsClicked)
+{
+    <p>Thanks for clicking me!</p>
+}
+
+<!-- [6] Event handlers-->
+<form >
+    <label>Increment by:</label>
+    <input type="range" min="0" max="@MaximumIncrementer" @bind="IncrementBy" @bind:event="oninput" />
+</form>
 
 <button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<p>Incrementing by: @IncrementBy</p>
 
 @code {
+    <!-- [7] -->
+    [CascadingParameter(Name = "MaximumIncrementer")]
+    protected int MaximumIncrementer { get; set; } = 100;
 
     private int currentCount = 0;
 
@@ -25,15 +42,26 @@
     [Parameter]
     public int IncrementBy { get; set; } = 1;
 
+    public bool IsClicked = false;
+
+    // [8]
     // [3]
     protected override void OnParametersSet()
     {
+        startingvalue = counterState.Value;
         currentCount = startingvalue;
         base.OnParametersSet();
     }
 
+    private void Toggle()
+    {
+        IsClicked = !IsClicked;
+    }
+
+    <!-- [8] Cascading Parameters-->
     private void IncrementCount()
     {
         currentCount += IncrementBy;
+        counterState.Value = currentCount;
     }
 }

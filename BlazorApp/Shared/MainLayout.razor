@@ -1,7 +1,6 @@
 ﻿@inherits LayoutComponentBase
 <!-- [3] This is used on all pages-->
 
-
 <PageTitle>BlazorApp</PageTitle>
 
 <div class="page">
@@ -15,7 +14,15 @@
         </div>
         <!-- [3] THis is where the content should be -->
         <article class="content px-4">
-            @Body
+            <!-- [7] Cascading Parameters-->
+            <div>
+                <CascadingValue Name="MaximumIncrementer" Value="300">
+                    @Body
+                </CascadingValue>
+            </div>
         </article>
+
+        <!-- [7] Outside the Cascading Parameters-->
+        <BlazorApp.Pages.Counter IncrementBy="4"/>
     </main>
 </div>

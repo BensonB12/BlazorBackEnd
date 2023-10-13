@@ -9,10 +9,17 @@
     }
 </ul>
 
-
-<input @bind="NewTodo" @bind:event="oninput" placeholder="What do you need to do?" />
-<input @bind="DueDate" @bind:format="yyyy-MM-dd" placeholder="Due Date" />
-<button @onclick="Save">Save</button>
+<!-- [9] EditForm -->
+<EditForm> <!-- [9] Model="DTOModel" OnValidSubmit="PlaceTodo"   now bind-value-->
+    <input @bind-value="NewTodo" @bind:event="oninput" placeholder="What do you need to do?" />
+    <input @bind-value="DueDate" @bind:format="yyyy-MM-dd" placeholder="Due Date" />
+    <!-- [9] ValidationMessage For=@(() => DueDate)-->
+    <button @onclick="Save">Save</button>
+    <!-- [10] Validation-->
+    <!--DataAnnotationsValidator-->
+    <!--[10] Go see Validation Message on line 16-->
+    <!--ValidationSummary-->
+</EditForm>
 
 @if(!string.IsNullOrEmpty(NewTodo))
 {
@@ -33,4 +40,8 @@
     {
         Todos.Add(new(NewTodo, DueDate));
     }
+
+    /*
+     * async Task PlaceTodo
+     */
 } 

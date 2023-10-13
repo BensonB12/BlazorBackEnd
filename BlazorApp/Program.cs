@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Web;
 using BlazorApp.Data;
+using BlazorApp.Shared;
 
 var builder = WebApplication.CreateBuilder(args);
 // [5] DEPENDANCY INJECTION BABY!!
@@ -9,6 +10,7 @@ builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
 builder.Services.AddServerSideBlazor();
 builder.Services.AddSingleton<WeatherForecastService>();
+builder.Services.AddScoped<CounterState>();
 
 var app = builder.Build();
 
