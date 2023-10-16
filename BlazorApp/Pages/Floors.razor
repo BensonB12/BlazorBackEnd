@@ -1,0 +1,44 @@
+﻿@page "/floors"
+@using BlazorApp.Data
+@using BlazorApp.DB_Data
+@using Microsoft.EntityFrameworkCore;
+@inject DbBensonbird25Context Context
+
+<PageTitle>Floors</PageTitle>
+
+<h3>Floors</h3>
+
+@if(floors is null)
+{
+    <div>Loading...</div>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Floornumber</th>
+                <th>PadLock Passwords</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var floor in floors)
+            {
+                <tr>
+                    <td>@floor.Id</td>
+                    <td>@foreach(var padLock in floor.FloorPadlocks) {<div>@padLock.Padlock.Pass</div>}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private IEnumerable<Floor>? floors { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //forecasts = await ForecastService.GetForecastAsync(DateOnly.FromDateTime(DateTime.Now)); [5]    VV new VV
+        floors = await Context.Floors.ToListAsync();
+    }
+}
