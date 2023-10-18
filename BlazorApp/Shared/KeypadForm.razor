@@ -1,0 +1,67 @@
+﻿@if (ExsistingPasskeys is not null && Keypad is not null && ExsistingDisplays is not null)
+{
+    <EditForm Model="@Keypad" OnValidSubmit="HandleValidSubmit" OnInvalidSubmit="HandleInvalidSubmit">
+        <DataAnnotationsValidator/>
+        @* <ValidationSummary/> *@
+
+        <div class="mb-3">
+            <label for="PassId" class="form-label">Password</label>
+
+            <InputSelect id="PassId" class="form-control" @bind-Value="Keypad.PassId">
+                <option selected disabled>Select Password</option>
+                @foreach (Passkey pk in ExsistingPasskeys)
+                {
+                    <option value="@pk.Id">@pk.Keystring</option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Keypad.PassId" />
+        </div>
+
+        <div class="mb-3">
+            <label for="DisplayId" class="form-label">Display</label>
+
+            <InputSelect id="DisplayId" class="form-control" @bind-Value="Keypad.DisplayId">
+                <option selected disabled>Select Display</option>
+                @foreach (Display d in ExsistingDisplays)
+                {
+                    <option value ="@d.Id">
+                        <div>@d.Title </div>
+                        @foreach (DisplayBtn b in d.DisplayBtns)
+                        {
+                            <div style="background-color: @b.Btn.Color.Title"> (@b.Btn.Title) </div>
+                        }
+                    </option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Keypad.DisplayId" />
+        </div>
+
+        <button type="submit" class="btn btn-primary" disabled="@LockedState">Add</button>
+    </EditForm>
+}
+
+@code{
+    [Parameter]
+    public Keypad? Keypad { get; set; }
+    [Parameter]
+    public List<Passkey>? ExsistingPasskeys { get; set; }
+    [Parameter]
+    public List<Display>? ExsistingDisplays { get; set; }
+    [Parameter]
+    public bool LockedState { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> OnSubmit { get; set; }
+
+    private async Task HandleValidSubmit()
+    {
+        if(OnSubmit.HasDelegate)
+            await OnSubmit.InvokeAsync(true);
+    }
+
+    private async Task HandleInvalidSubmit()
+    {
+        if (OnSubmit.HasDelegate)
+            await OnSubmit.InvokeAsync(true);
+    }
+}

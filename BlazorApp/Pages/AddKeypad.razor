@@ -5,57 +5,30 @@
 
 <h3>Add Keypad</h3>
 
-@if (ExsistingPasskeys is not null && Keypad is not null && ExsistingDisplays is not null)
+<KeypadForm Keypad="Keypad" 
+    ExsistingDisplays="ExsistingDisplays" 
+    ExsistingPasskeys="ExsistingPasskeys"
+    LockedState="LockedState"
+    OnSubmit="HandleSubmit"/>
+
+@if(SuccessMessage is not null)
 {
-    <EditForm Model="@Keypad">
-        <DataAnnotationsValidator/>
-        <ValidationSummary/>
-
-        <div class="mb-3">
-            <label for="PassId" class="form-label">Password</label>
-
-            <InputSelect id="PassId" class="form-control" @bind-Value="Keypad.PassId">
-                    <option selected disabled>Select Password</option>
-                    @foreach (Passkey pk in ExsistingPasskeys)
-                    {
-                        <option value="@pk.Id">@pk.Keystring</option>
-                    }
-            </InputSelect>
-            <ValidationMessage For="() => Keypad.PassId" />
-        </div>
-
-        <div class="mb-3">
-            <label for="DisplayId" class="form-label">Display</label>
-
-            <InputSelect id="DisplayId" class="form-control" @bind-Value="Keypad.DisplayId">
-                <option selected disabled>Select Display</option>
-                @foreach (Display d in ExsistingDisplays)
-                {
-                    <option value ="@d.Id">
-                        <div>@d.Title </div>
-                        @foreach (DisplayBtn b in d.DisplayBtns)
-                        {
-                            <div style="background-color: @b.Btn.Color.Title"> (@b.Btn.Title) </div>
-                        }
-                    </option>
-                }
-            </InputSelect>
-            <ValidationMessage For="() => Keypad.DisplayId" />
-        </div>
-
-        <button type="submit" class="btn btn-primary">Add</button>
-    </EditForm>
+    <div class="alert alert-success">@SuccessMessage</div>
 }
-else
+
+@if (FailureMessage is not null)
 {
-    <h5>Loading ...</h5>
+    <div class="alert alert-danger">@FailureMessage</div>
 }
+
 
 @code {
-
+    public string? SuccessMessage { get; set; }
+    public string? FailureMessage { get; set; }
     public Keypad? Keypad { get; set; }
     public List<Passkey>? ExsistingPasskeys { get; set; }
     public List<Display>? ExsistingDisplays { get; set; }
+    public bool LockedState { get; set; }
 
     protected override async void OnInitialized()
     {
@@ -73,5 +46,51 @@ else
         Keypad = new();
 
         StateHasChanged();
+    }
+
+    private void HandleInvalidSubmit()
+    {
+        FailureMessage = null;
+        SuccessMessage = null;
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (LockedState)
+            return;
+
+        LockedState = true;
+
+        try
+        {
+            if(Keypad is not null)
+            {
+                using var context = ContextFactory.CreateDbContext();
+
+                context.Keypads.Add(Keypad);
+                await context.SaveChangesAsync();
+
+                SuccessMessage = $"Keypad with this title: '{Keypad?.Display.Title}' Saved! Thank you";
+                FailureMessage = null;
+
+                Keypad = new();
+            }
+        }
+        catch (Exception e)
+        {
+            FailureMessage = $"Keypad with this title: '{Keypad?.Display.Title}' Did not save! Something went wrong :(";
+            Console.WriteLine(e.Message);
+            SuccessMessage = null;
+        }
+
+        LockedState = false;
+    }
+
+    private async Task HandleSubmit(bool isValid)
+    {
+        if (isValid)
+            await HandleValidSubmit();
+        else
+            HandleInvalidSubmit();
     }
 }
