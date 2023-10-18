@@ -7,9 +7,9 @@ public partial class Color
 {
     public int Id { get; set; }
 
-    public string? Title { get; set; }
+    public string Title { get; set; } = null!;
 
-    public int? HexValueInt { get; set; }
+    public string HexValue { get; set; } = null!;
 
     public virtual ICollection<Button> Buttons { get; set; } = new List<Button>();
 

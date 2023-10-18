@@ -3,15 +3,15 @@ using System.Collections.Generic;
 
 namespace BlazorApp.Data.DbModel;
 
-public partial class RequiredFloor
+public partial class Requiredfloor
 {
     public int Id { get; set; }
 
-    public int ChosenFloorId { get; set; }
+    public int ChosenfloorId { get; set; }
 
-    public int RequiredFloorId { get; set; }
+    public int RequiredfloorId { get; set; }
 
-    public virtual Floor ChosenFloor { get; set; } = null!;
+    public virtual Floor Chosenfloor { get; set; } = null!;
 
-    public virtual Floor RequiredFloorNavigation { get; set; } = null!;
+    public virtual Floor RequiredfloorNavigation { get; set; } = null!;
 }

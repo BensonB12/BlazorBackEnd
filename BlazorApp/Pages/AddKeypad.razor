@@ -1,0 +1,77 @@
+﻿@page "/keypad/add"
+@inject IDbContextFactory<DbBensonbird25Context> ContextFactory
+
+<PageTitle>Add Keypad</PageTitle>
+
+<h3>Add Keypad</h3>
+
+@if (ExsistingPasskeys is not null && Keypad is not null && ExsistingDisplays is not null)
+{
+    <EditForm Model="@Keypad">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <div class="mb-3">
+            <label for="PassId" class="form-label">Password</label>
+
+            <InputSelect id="PassId" class="form-control" @bind-Value="Keypad.PassId">
+                    <option selected disabled>Select Password</option>
+                    @foreach (Passkey pk in ExsistingPasskeys)
+                    {
+                        <option value="@pk.Id">@pk.Keystring</option>
+                    }
+            </InputSelect>
+            <ValidationMessage For="() => Keypad.PassId" />
+        </div>
+
+        <div class="mb-3">
+            <label for="DisplayId" class="form-label">Display</label>
+
+            <InputSelect id="DisplayId" class="form-control" @bind-Value="Keypad.DisplayId">
+                <option selected disabled>Select Display</option>
+                @foreach (Display d in ExsistingDisplays)
+                {
+                    <option value ="@d.Id">
+                        <div>@d.Title </div>
+                        @foreach (DisplayBtn b in d.DisplayBtns)
+                        {
+                            <div style="background-color: @b.Btn.Color.Title"> (@b.Btn.Title) </div>
+                        }
+                    </option>
+                }
+            </InputSelect>
+            <ValidationMessage For="() => Keypad.DisplayId" />
+        </div>
+
+        <button type="submit" class="btn btn-primary">Add</button>
+    </EditForm>
+}
+else
+{
+    <h5>Loading ...</h5>
+}
+
+@code {
+
+    public Keypad? Keypad { get; set; }
+    public List<Passkey>? ExsistingPasskeys { get; set; }
+    public List<Display>? ExsistingDisplays { get; set; }
+
+    protected override async void OnInitialized()
+    {
+        var context = ContextFactory.CreateDbContext();
+
+        ExsistingPasskeys = await context.Passkeys
+                                .ToListAsync();
+
+        ExsistingDisplays = await context.Displays
+                                .Include(d => d.DisplayBtns)
+                                .ThenInclude(db => db.Btn)
+                                .ThenInclude(b => b.Color)
+                                .ToListAsync();
+
+        Keypad = new();
+
+        StateHasChanged();
+    }
+}

@@ -9,5 +9,5 @@ public partial class Passkey
 
     public string Keystring { get; set; } = null!;
 
-    public virtual ICollection<Padlock> Padlocks { get; set; } = new List<Padlock>();
+    public virtual ICollection<Keypad> Keypads { get; set; } = new List<Keypad>();
 }

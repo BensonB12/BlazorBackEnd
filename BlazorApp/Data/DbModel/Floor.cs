@@ -7,10 +7,11 @@ public partial class Floor
 {
     public int Id { get; set; }
 
-    public virtual ICollection<FloorPadlock> FloorPadlocks { get; set; } = new List<FloorPadlock>();
+    public virtual ICollection<FloorKeypad> FloorKeypads { get; set; } = new List<FloorKeypad>();
 
-    public virtual ICollection<RequiredFloor> RequiredFloorChosenFloors { get; set; } = new List<RequiredFloor>();
-
-    public virtual ICollection<RequiredFloor> RequiredFloorRequiredFloorNavigations { get; set; } = new List<RequiredFloor>();
     public virtual ICollection<Outcome> Outcomes { get; set; } = new List<Outcome>();
+
+    public virtual ICollection<Requiredfloor> RequiredfloorChosenfloors { get; set; } = new List<Requiredfloor>();
+
+    public virtual ICollection<Requiredfloor> RequiredfloorRequiredfloorNavigations { get; set; } = new List<Requiredfloor>();
 }

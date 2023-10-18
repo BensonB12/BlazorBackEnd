@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BlazorApp.Migrations
 {
     [DbContext(typeof(DbBensonbird25Context))]
-    [Migration("20231018005357_OutcomesAdded")]
-    partial class OutcomesAdded
+    [Migration("20231018080920_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,26 +34,31 @@ namespace BlazorApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ColorId")
+                    b.Property<int>("ColorId")
                         .HasColumnType("integer")
                         .HasColumnName("color_id");
 
-                    b.Property<int?>("FontId")
+                    b.Property<int>("FontId")
                         .HasColumnType("integer")
                         .HasColumnName("font_id");
 
-                    b.Property<int?>("Proportion")
+                    b.Property<int>("Proportion")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("proportion");
+                        .HasColumnName("proportion")
+                        .HasDefaultValueSql("1");
 
-                    b.Property<int?>("ShapeId")
+                    b.Property<int>("ShapeId")
                         .HasColumnType("integer")
                         .HasColumnName("shape_id");
 
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)")
-                        .HasColumnName("title");
+                        .HasColumnName("title")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id")
                         .HasName("button_pkey");
@@ -76,14 +81,20 @@ namespace BlazorApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("HexValueInt")
-                        .HasColumnType("integer")
-                        .HasColumnName("hex_value_int");
+                    b.Property<string>("HexValue")
+                        .IsRequired()
+                        .HasMaxLength(6)
+                        .HasColumnType("character(6)")
+                        .HasColumnName("hex_value")
+                        .IsFixedLength();
 
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("title");
+                        .HasColumnName("title")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id")
                         .HasName("color_pkey");
@@ -97,10 +108,6 @@ namespace BlazorApp.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("id");
 
-                    b.Property<int?>("BtnId")
-                        .HasColumnType("integer")
-                        .HasColumnName("btn_id");
-
                     b.Property<int?>("ColorId")
                         .HasColumnType("integer")
                         .HasColumnName("color_id");
@@ -110,8 +117,10 @@ namespace BlazorApp.Migrations
                         .HasColumnName("font_id");
 
                     b.Property<int?>("Proportion")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("proportion");
+                        .HasColumnName("proportion")
+                        .HasDefaultValueSql("1");
 
                     b.Property<int?>("ShapeId")
                         .HasColumnType("integer")
@@ -124,8 +133,6 @@ namespace BlazorApp.Migrations
 
                     b.HasKey("Id")
                         .HasName("display_pkey");
-
-                    b.HasIndex("BtnId");
 
                     b.HasIndex("ColorId");
 
@@ -178,31 +185,30 @@ namespace BlazorApp.Migrations
                     b.ToTable("floor", "game234");
                 });
 
-            modelBuilder.Entity("BlazorApp.Data.DbModel.FloorPadlock", b =>
+            modelBuilder.Entity("BlazorApp.Data.DbModel.FloorKeypad", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("nextval('game234.floor_padlock_id_seq'::regclass)");
 
                     b.Property<int>("FloorId")
                         .HasColumnType("integer")
                         .HasColumnName("floor_id");
 
-                    b.Property<int>("PadlockId")
+                    b.Property<int>("KeypadId")
                         .HasColumnType("integer")
-                        .HasColumnName("padlock_id");
+                        .HasColumnName("keypad_id");
 
                     b.HasKey("Id")
                         .HasName("floor_padlock_pkey");
 
                     b.HasIndex("FloorId");
 
-                    b.HasIndex("PadlockId");
+                    b.HasIndex("KeypadId");
 
-                    b.ToTable("floor_padlock", "game234");
+                    b.ToTable("floor_keypad", "game234");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Font", b =>
@@ -259,22 +265,48 @@ namespace BlazorApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("FloorPadlockId")
+                    b.Property<int>("FloorKeypadId")
                         .HasColumnType("integer")
-                        .HasColumnName("floor_padlock_id");
+                        .HasColumnName("floor_keypad_id");
 
-                    b.Property<int?>("GamerId")
+                    b.Property<int>("GamerId")
                         .HasColumnType("integer")
                         .HasColumnName("gamer_id");
 
                     b.HasKey("Id")
                         .HasName("gamer_log_pkey");
 
-                    b.HasIndex("FloorPadlockId");
+                    b.HasIndex("FloorKeypadId");
 
                     b.HasIndex("GamerId");
 
                     b.ToTable("gamer_log", "game234");
+                });
+
+            modelBuilder.Entity("BlazorApp.Data.DbModel.Keypad", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("id")
+                        .HasDefaultValueSql("nextval('game234.padlock_id_seq'::regclass)");
+
+                    b.Property<int>("DisplayId")
+                        .HasColumnType("integer")
+                        .HasColumnName("display_id");
+
+                    b.Property<int>("PassId")
+                        .HasColumnType("integer")
+                        .HasColumnName("pass_id");
+
+                    b.HasKey("Id")
+                        .HasName("pad_pass_pkey");
+
+                    b.HasIndex("DisplayId");
+
+                    b.HasIndex("PassId");
+
+                    b.ToTable("keypad", "game234");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Outcome", b =>
@@ -286,49 +318,22 @@ namespace BlazorApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("FloorId")
+                    b.Property<int>("FloorId")
                         .HasColumnType("integer")
                         .HasColumnName("floor_id");
 
-                    b.Property<int?>("FloorPadlockId")
+                    b.Property<int>("FloorKeypadId")
                         .HasColumnType("integer")
-                        .HasColumnName("floor_padlock_id");
+                        .HasColumnName("floor_keypad_id");
 
                     b.HasKey("Id")
                         .HasName("outcome_pkey");
 
-                    b.HasIndex("FloorId");
+                    b.HasIndex(new[] { "FloorId" }, "IX_outcome_floor_id");
 
-                    b.HasIndex("FloorPadlockId");
+                    b.HasIndex(new[] { "FloorKeypadId" }, "IX_outcome_floor_padlock_id");
 
                     b.ToTable("outcome", "game234");
-                });
-
-            modelBuilder.Entity("BlazorApp.Data.DbModel.Padlock", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("id");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("DisplayId")
-                        .HasColumnType("integer")
-                        .HasColumnName("display_id");
-
-                    b.Property<int?>("PassId")
-                        .HasColumnType("integer")
-                        .HasColumnName("pass_id");
-
-                    b.HasKey("Id")
-                        .HasName("pad_pass_pkey");
-
-                    b.HasIndex("DisplayId");
-
-                    b.HasIndex("PassId");
-
-                    b.ToTable("padlock", "game234");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Passkey", b =>
@@ -351,7 +356,7 @@ namespace BlazorApp.Migrations
                     b.ToTable("passkey", "game234");
                 });
 
-            modelBuilder.Entity("BlazorApp.Data.DbModel.RequiredFloor", b =>
+            modelBuilder.Entity("BlazorApp.Data.DbModel.Requiredfloor", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -360,20 +365,20 @@ namespace BlazorApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ChosenFloorId")
+                    b.Property<int>("ChosenfloorId")
                         .HasColumnType("integer")
                         .HasColumnName("chosenfloor_id");
 
-                    b.Property<int>("RequiredFloorId")
+                    b.Property<int>("RequiredfloorId")
                         .HasColumnType("integer")
                         .HasColumnName("requiredfloor_id");
 
                     b.HasKey("Id")
                         .HasName("requiredfloor_pkey");
 
-                    b.HasIndex("ChosenFloorId");
+                    b.HasIndex("ChosenfloorId");
 
-                    b.HasIndex("RequiredFloorId");
+                    b.HasIndex("RequiredfloorId");
 
                     b.ToTable("requiredfloor", "game234");
                 });
@@ -387,14 +392,17 @@ namespace BlazorApp.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("Numsides")
+                    b.Property<int>("Numsides")
                         .HasColumnType("integer")
                         .HasColumnName("numsides");
 
                     b.Property<string>("Title")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
                         .HasColumnType("character varying(50)")
-                        .HasColumnName("title");
+                        .HasColumnName("title")
+                        .HasDefaultValueSql("''::character varying");
 
                     b.HasKey("Id")
                         .HasName("shape_pkey");
@@ -407,16 +415,22 @@ namespace BlazorApp.Migrations
                     b.HasOne("BlazorApp.Data.DbModel.Color", "Color")
                         .WithMany("Buttons")
                         .HasForeignKey("ColorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("button_color_id_fkey");
 
                     b.HasOne("BlazorApp.Data.DbModel.Font", "Font")
                         .WithMany("Buttons")
                         .HasForeignKey("FontId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("button_font_id_fkey");
 
                     b.HasOne("BlazorApp.Data.DbModel.Shape", "Shape")
                         .WithMany("Buttons")
                         .HasForeignKey("ShapeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("button_shape_id_fkey");
 
                     b.Navigation("Color");
@@ -428,11 +442,6 @@ namespace BlazorApp.Migrations
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Display", b =>
                 {
-                    b.HasOne("BlazorApp.Data.DbModel.Button", "Btn")
-                        .WithMany("Displays")
-                        .HasForeignKey("BtnId")
-                        .HasConstraintName("display_btn_id_fkey");
-
                     b.HasOne("BlazorApp.Data.DbModel.Color", "Color")
                         .WithMany("Displays")
                         .HasForeignKey("ColorId")
@@ -447,8 +456,6 @@ namespace BlazorApp.Migrations
                         .WithMany("Displays")
                         .HasForeignKey("ShapeId")
                         .HasConstraintName("display_shape_id_fkey");
-
-                    b.Navigation("Btn");
 
                     b.Navigation("Color");
 
@@ -476,69 +483,60 @@ namespace BlazorApp.Migrations
                     b.Navigation("Display");
                 });
 
-            modelBuilder.Entity("BlazorApp.Data.DbModel.FloorPadlock", b =>
+            modelBuilder.Entity("BlazorApp.Data.DbModel.FloorKeypad", b =>
                 {
                     b.HasOne("BlazorApp.Data.DbModel.Floor", "Floor")
-                        .WithMany("FloorPadlocks")
+                        .WithMany("FloorKeypads")
                         .HasForeignKey("FloorId")
                         .IsRequired()
                         .HasConstraintName("floor_padlock_floor_id_fkey");
 
-                    b.HasOne("BlazorApp.Data.DbModel.Padlock", "Padlock")
-                        .WithMany("FloorPadlocks")
-                        .HasForeignKey("PadlockId")
+                    b.HasOne("BlazorApp.Data.DbModel.Keypad", "Keypad")
+                        .WithMany("FloorKeypads")
+                        .HasForeignKey("KeypadId")
                         .IsRequired()
                         .HasConstraintName("floor_padlock_padlock_id_fkey");
 
                     b.Navigation("Floor");
 
-                    b.Navigation("Padlock");
+                    b.Navigation("Keypad");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.GamerLog", b =>
                 {
-                    b.HasOne("BlazorApp.Data.DbModel.FloorPadlock", "FloorPadlock")
+                    b.HasOne("BlazorApp.Data.DbModel.FloorKeypad", "FloorKeypad")
                         .WithMany("GamerLogs")
-                        .HasForeignKey("FloorPadlockId")
+                        .HasForeignKey("FloorKeypadId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("gamer_log_floor_padlock_id_fkey");
 
                     b.HasOne("BlazorApp.Data.DbModel.Gamer", "Gamer")
                         .WithMany("GamerLogs")
                         .HasForeignKey("GamerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("gamer_log_gamer_id_fkey");
 
-                    b.Navigation("FloorPadlock");
+                    b.Navigation("FloorKeypad");
 
                     b.Navigation("Gamer");
                 });
 
-            modelBuilder.Entity("BlazorApp.Data.DbModel.Outcome", b =>
-                {
-                    b.HasOne("BlazorApp.Data.DbModel.Floor", "Floor")
-                        .WithMany("Outcomes")
-                        .HasForeignKey("FloorId")
-                        .HasConstraintName("outcome_floor_id_fkey");
-
-                    b.HasOne("BlazorApp.Data.DbModel.FloorPadlock", "FloorPadlock")
-                        .WithMany("Outcomes")
-                        .HasForeignKey("FloorPadlockId")
-                        .HasConstraintName("outcome_floor_padlock_id_fkey");
-
-                    b.Navigation("Floor");
-
-                    b.Navigation("FloorPadlock");
-                });
-
-            modelBuilder.Entity("BlazorApp.Data.DbModel.Padlock", b =>
+            modelBuilder.Entity("BlazorApp.Data.DbModel.Keypad", b =>
                 {
                     b.HasOne("BlazorApp.Data.DbModel.Display", "Display")
-                        .WithMany("Padlocks")
+                        .WithMany("Keypads")
                         .HasForeignKey("DisplayId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("padlock_display_id_fkey");
 
                     b.HasOne("BlazorApp.Data.DbModel.Passkey", "Pass")
-                        .WithMany("Padlocks")
+                        .WithMany("Keypads")
                         .HasForeignKey("PassId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("padlock_pass_id_fkey");
 
                     b.Navigation("Display");
@@ -546,30 +544,47 @@ namespace BlazorApp.Migrations
                     b.Navigation("Pass");
                 });
 
-            modelBuilder.Entity("BlazorApp.Data.DbModel.RequiredFloor", b =>
+            modelBuilder.Entity("BlazorApp.Data.DbModel.Outcome", b =>
                 {
-                    b.HasOne("BlazorApp.Data.DbModel.Floor", "ChosenFloor")
-                        .WithMany("RequiredFloorChosenFloors")
-                        .HasForeignKey("ChosenFloorId")
+                    b.HasOne("BlazorApp.Data.DbModel.Floor", "Floor")
+                        .WithMany("Outcomes")
+                        .HasForeignKey("FloorId")
+                        .IsRequired()
+                        .HasConstraintName("outcome_floor_id_fkey");
+
+                    b.HasOne("BlazorApp.Data.DbModel.FloorKeypad", "FloorKeypad")
+                        .WithMany("Outcomes")
+                        .HasForeignKey("FloorKeypadId")
+                        .IsRequired()
+                        .HasConstraintName("outcome_floor_padlock_id_fkey");
+
+                    b.Navigation("Floor");
+
+                    b.Navigation("FloorKeypad");
+                });
+
+            modelBuilder.Entity("BlazorApp.Data.DbModel.Requiredfloor", b =>
+                {
+                    b.HasOne("BlazorApp.Data.DbModel.Floor", "Chosenfloor")
+                        .WithMany("RequiredfloorChosenfloors")
+                        .HasForeignKey("ChosenfloorId")
                         .IsRequired()
                         .HasConstraintName("requiredfloor_chosenfloor_id_fkey");
 
-                    b.HasOne("BlazorApp.Data.DbModel.Floor", "RequiredFloorNavigation")
-                        .WithMany("RequiredFloorRequiredFloorNavigations")
-                        .HasForeignKey("RequiredFloorId")
+                    b.HasOne("BlazorApp.Data.DbModel.Floor", "RequiredfloorNavigation")
+                        .WithMany("RequiredfloorRequiredfloorNavigations")
+                        .HasForeignKey("RequiredfloorId")
                         .IsRequired()
                         .HasConstraintName("requiredfloor_requiredfloor_id_fkey");
 
-                    b.Navigation("ChosenFloor");
+                    b.Navigation("Chosenfloor");
 
-                    b.Navigation("RequiredFloorNavigation");
+                    b.Navigation("RequiredfloorNavigation");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Button", b =>
                 {
                     b.Navigation("DisplayBtns");
-
-                    b.Navigation("Displays");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Color", b =>
@@ -583,21 +598,21 @@ namespace BlazorApp.Migrations
                 {
                     b.Navigation("DisplayBtns");
 
-                    b.Navigation("Padlocks");
+                    b.Navigation("Keypads");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Floor", b =>
                 {
-                    b.Navigation("FloorPadlocks");
+                    b.Navigation("FloorKeypads");
 
                     b.Navigation("Outcomes");
 
-                    b.Navigation("RequiredFloorChosenFloors");
+                    b.Navigation("RequiredfloorChosenfloors");
 
-                    b.Navigation("RequiredFloorRequiredFloorNavigations");
+                    b.Navigation("RequiredfloorRequiredfloorNavigations");
                 });
 
-            modelBuilder.Entity("BlazorApp.Data.DbModel.FloorPadlock", b =>
+            modelBuilder.Entity("BlazorApp.Data.DbModel.FloorKeypad", b =>
                 {
                     b.Navigation("GamerLogs");
 
@@ -616,14 +631,14 @@ namespace BlazorApp.Migrations
                     b.Navigation("GamerLogs");
                 });
 
-            modelBuilder.Entity("BlazorApp.Data.DbModel.Padlock", b =>
+            modelBuilder.Entity("BlazorApp.Data.DbModel.Keypad", b =>
                 {
-                    b.Navigation("FloorPadlocks");
+                    b.Navigation("FloorKeypads");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Passkey", b =>
                 {
-                    b.Navigation("Padlocks");
+                    b.Navigation("Keypads");
                 });
 
             modelBuilder.Entity("BlazorApp.Data.DbModel.Shape", b =>

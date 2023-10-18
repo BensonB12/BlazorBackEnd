@@ -1,0 +1,24 @@
+﻿@page "/floors/add"
+
+<PageTitle>Add Floor</PageTitle>
+
+<h3>Add Floor</h3>
+
+@if(Floor is not null)
+{
+    <EditForm Model="@Floor">
+        <DataAnnotationsValidator/>
+        <ValidationSummary/>
+
+        <button type="submit" class="btn btn-primary">Add</button>
+    </EditForm>
+}
+
+@code {
+    public Floor? Floor { get; set; }
+
+    protected override void OnInitialized()
+    {
+        Floor = new();
+    }
+}

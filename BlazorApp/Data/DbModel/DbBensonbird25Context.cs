@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BlazorApp.Data.DbModel;
 
@@ -26,7 +25,7 @@ public partial class DbBensonbird25Context : DbContext
 
     public virtual DbSet<Floor> Floors { get; set; }
 
-    public virtual DbSet<FloorPadlock> FloorPadlocks { get; set; }
+    public virtual DbSet<FloorKeypad> FloorKeypads { get; set; }
 
     public virtual DbSet<Font> Fonts { get; set; }
 
@@ -34,9 +33,13 @@ public partial class DbBensonbird25Context : DbContext
 
     public virtual DbSet<GamerLog> GamerLogs { get; set; }
 
-    public virtual DbSet<Padlock> Padlocks { get; set; }
+    public virtual DbSet<Keypad> Keypads { get; set; }
+
+    public virtual DbSet<Outcome> Outcomes { get; set; }
 
     public virtual DbSet<Passkey> Passkeys { get; set; }
+
+    public virtual DbSet<Requiredfloor> Requiredfloors { get; set; }
 
     public virtual DbSet<Shape> Shapes { get; set; }
 
@@ -54,10 +57,13 @@ public partial class DbBensonbird25Context : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ColorId).HasColumnName("color_id");
             entity.Property(e => e.FontId).HasColumnName("font_id");
-            entity.Property(e => e.Proportion).HasColumnName("proportion");
+            entity.Property(e => e.Proportion)
+                .HasDefaultValueSql("1")
+                .HasColumnName("proportion");
             entity.Property(e => e.ShapeId).HasColumnName("shape_id");
             entity.Property(e => e.Title)
                 .HasMaxLength(20)
+                .HasDefaultValueSql("''::character varying")
                 .HasColumnName("title");
 
             entity.HasOne(d => d.Color).WithMany(p => p.Buttons)
@@ -80,9 +86,13 @@ public partial class DbBensonbird25Context : DbContext
             entity.ToTable("color", "game234");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.HexValueInt).HasColumnName("hex_value_int");
+            entity.Property(e => e.HexValue)
+                .HasMaxLength(6)
+                .IsFixedLength()
+                .HasColumnName("hex_value");
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
+                .HasDefaultValueSql("''::character varying")
                 .HasColumnName("title");
         });
 
@@ -95,16 +105,13 @@ public partial class DbBensonbird25Context : DbContext
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
                 .HasColumnName("id");
-            entity.Property(e => e.BtnId).HasColumnName("btn_id");
             entity.Property(e => e.ColorId).HasColumnName("color_id");
             entity.Property(e => e.FontId).HasColumnName("font_id");
-            entity.Property(e => e.Proportion).HasColumnName("proportion");
+            entity.Property(e => e.Proportion)
+                .HasDefaultValueSql("1")
+                .HasColumnName("proportion");
             entity.Property(e => e.ShapeId).HasColumnName("shape_id");
             entity.Property(e => e.Title).HasColumnName("title");
-
-            entity.HasOne(d => d.Btn).WithMany(p => p.Displays)
-                .HasForeignKey(d => d.BtnId)
-                .HasConstraintName("display_btn_id_fkey");
 
             entity.HasOne(d => d.Color).WithMany(p => p.Displays)
                 .HasForeignKey(d => d.ColorId)
@@ -149,23 +156,25 @@ public partial class DbBensonbird25Context : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
         });
 
-        modelBuilder.Entity<FloorPadlock>(entity =>
+        modelBuilder.Entity<FloorKeypad>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("floor_padlock_pkey");
 
-            entity.ToTable("floor_padlock", "game234");
+            entity.ToTable("floor_keypad", "game234");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval('game234.floor_padlock_id_seq'::regclass)")
+                .HasColumnName("id");
             entity.Property(e => e.FloorId).HasColumnName("floor_id");
-            entity.Property(e => e.PadlockId).HasColumnName("padlock_id");
+            entity.Property(e => e.KeypadId).HasColumnName("keypad_id");
 
-            entity.HasOne(d => d.Floor).WithMany(p => p.FloorPadlocks)
+            entity.HasOne(d => d.Floor).WithMany(p => p.FloorKeypads)
                 .HasForeignKey(d => d.FloorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("floor_padlock_floor_id_fkey");
 
-            entity.HasOne(d => d.Padlock).WithMany(p => p.FloorPadlocks)
-                .HasForeignKey(d => d.PadlockId)
+            entity.HasOne(d => d.Keypad).WithMany(p => p.FloorKeypads)
+                .HasForeignKey(d => d.KeypadId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("floor_padlock_padlock_id_fkey");
         });
@@ -202,11 +211,11 @@ public partial class DbBensonbird25Context : DbContext
             entity.ToTable("gamer_log", "game234");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.FloorPadlockId).HasColumnName("floor_padlock_id");
+            entity.Property(e => e.FloorKeypadId).HasColumnName("floor_keypad_id");
             entity.Property(e => e.GamerId).HasColumnName("gamer_id");
 
-            entity.HasOne(d => d.FloorPadlock).WithMany(p => p.GamerLogs)
-                .HasForeignKey(d => d.FloorPadlockId)
+            entity.HasOne(d => d.FloorKeypad).WithMany(p => p.GamerLogs)
+                .HasForeignKey(d => d.FloorKeypadId)
                 .HasConstraintName("gamer_log_floor_padlock_id_fkey");
 
             entity.HasOne(d => d.Gamer).WithMany(p => p.GamerLogs)
@@ -214,23 +223,50 @@ public partial class DbBensonbird25Context : DbContext
                 .HasConstraintName("gamer_log_gamer_id_fkey");
         });
 
-        modelBuilder.Entity<Padlock>(entity =>
+        modelBuilder.Entity<Keypad>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("pad_pass_pkey");
 
-            entity.ToTable("padlock", "game234");
+            entity.ToTable("keypad", "game234");
 
-            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Id)
+                .HasDefaultValueSql("nextval('game234.padlock_id_seq'::regclass)")
+                .HasColumnName("id");
             entity.Property(e => e.DisplayId).HasColumnName("display_id");
             entity.Property(e => e.PassId).HasColumnName("pass_id");
 
-            entity.HasOne(d => d.Display).WithMany(p => p.Padlocks)
+            entity.HasOne(d => d.Display).WithMany(p => p.Keypads)
                 .HasForeignKey(d => d.DisplayId)
                 .HasConstraintName("padlock_display_id_fkey");
 
-            entity.HasOne(d => d.Pass).WithMany(p => p.Padlocks)
+            entity.HasOne(d => d.Pass).WithMany(p => p.Keypads)
                 .HasForeignKey(d => d.PassId)
                 .HasConstraintName("padlock_pass_id_fkey");
+        });
+
+        modelBuilder.Entity<Outcome>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("outcome_pkey");
+
+            entity.ToTable("outcome", "game234");
+
+            entity.HasIndex(e => e.FloorId, "IX_outcome_floor_id");
+
+            entity.HasIndex(e => e.FloorKeypadId, "IX_outcome_floor_padlock_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.FloorId).HasColumnName("floor_id");
+            entity.Property(e => e.FloorKeypadId).HasColumnName("floor_keypad_id");
+
+            entity.HasOne(d => d.Floor).WithMany(p => p.Outcomes)
+                .HasForeignKey(d => d.FloorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("outcome_floor_id_fkey");
+
+            entity.HasOne(d => d.FloorKeypad).WithMany(p => p.Outcomes)
+                .HasForeignKey(d => d.FloorKeypadId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("outcome_floor_padlock_id_fkey");
         });
 
         modelBuilder.Entity<Passkey>(entity =>
@@ -243,23 +279,23 @@ public partial class DbBensonbird25Context : DbContext
             entity.Property(e => e.Keystring).HasColumnName("keystring");
         });
 
-        modelBuilder.Entity<RequiredFloor>(entity =>
+        modelBuilder.Entity<Requiredfloor>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("requiredfloor_pkey");
 
             entity.ToTable("requiredfloor", "game234");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.ChosenFloorId).HasColumnName("chosenfloor_id");
-            entity.Property(e => e.RequiredFloorId).HasColumnName("requiredfloor_id");
+            entity.Property(e => e.ChosenfloorId).HasColumnName("chosenfloor_id");
+            entity.Property(e => e.RequiredfloorId).HasColumnName("requiredfloor_id");
 
-            entity.HasOne(d => d.ChosenFloor).WithMany(p => p.RequiredFloorChosenFloors)
-                .HasForeignKey(d => d.ChosenFloorId)
+            entity.HasOne(d => d.Chosenfloor).WithMany(p => p.RequiredfloorChosenfloors)
+                .HasForeignKey(d => d.ChosenfloorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("requiredfloor_chosenfloor_id_fkey");
 
-            entity.HasOne(d => d.RequiredFloorNavigation).WithMany(p => p.RequiredFloorRequiredFloorNavigations)
-                .HasForeignKey(d => d.RequiredFloorId)
+            entity.HasOne(d => d.RequiredfloorNavigation).WithMany(p => p.RequiredfloorRequiredfloorNavigations)
+                .HasForeignKey(d => d.RequiredfloorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("requiredfloor_requiredfloor_id_fkey");
         });
@@ -274,28 +310,8 @@ public partial class DbBensonbird25Context : DbContext
             entity.Property(e => e.Numsides).HasColumnName("numsides");
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
+                .HasDefaultValueSql("''::character varying")
                 .HasColumnName("title");
-        });
-
-        modelBuilder.Entity<Outcome>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("outcome_pkey");
-
-            entity.ToTable("outcome", "game234");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.FloorPadlockId).HasColumnName("floor_padlock_id");
-            entity.Property(e => e.FloorId).HasColumnName("floor_id");
-
-            entity.HasOne(d => d.Floor).WithMany(p => p.Outcomes)
-                .HasForeignKey(d => d.FloorId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("outcome_floor_id_fkey");
-
-            entity.HasOne(d => d.FloorPadlock).WithMany(p => p.Outcomes)
-                .HasForeignKey(d => d.FloorPadlockId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("outcome_floor_padlock_id_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -1,0 +1,91 @@
+﻿@page "/floors/{currentPage:int?}"
+@inject IDbContextFactory<DbBensonbird25Context> ContextFactory
+@inject NavigationManager NavigationManager
+
+<PageTitle>Floors</PageTitle>
+
+<h3>Floors</h3>
+
+@if(floors is null)
+{
+    <div>Loading...</div>
+}
+else
+{
+    <ul class="pagination">
+
+        <li class="page-item @(CurrentPage == 1 ? "disabled" : "")">
+            <a class="page-link" href="/floors/@(CurrentPage - 1)">Previous</a>
+        </li>
+
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            <li class="page-item @(CurrentPage == i ? "active" : "")">
+                <a class="page-link" href="/floors/@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(CurrentPage == TotalPages ? "disabled" : "")">
+            <a class="page-link" href="/floors/@(CurrentPage + 1)">Next</a>
+        </li>
+    </ul>
+
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Floornumber</th>
+                <th>PadLock Passwords</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach(var floor in floors)
+            {
+                <tr>
+                    <td>@floor.Id</td>
+                    <td>@foreach(var padLock in floor.FloorKeypads) {<div>@padLock.Keypad.Pass</div>}</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    [Parameter]
+    public int? CurrentPage { get; set; }
+
+    private IEnumerable<Floor>? floors { get; set; }
+
+    private int TotalPages { get; set; }
+
+    private const int ItemsPerPage = 4;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (CurrentPage is null or < 0)
+        {
+            NavigationManager.NavigateTo("/floors/1");
+            return;
+        }
+
+        using var context = ContextFactory.CreateDbContext();
+
+        int floorCount = await context.Floors.CountAsync();
+        TotalPages = floorCount == 0 ? 
+            1 : (int) Math.Ceiling( (double) floorCount / ItemsPerPage);
+
+        if(CurrentPage > TotalPages)
+        {
+            NavigationManager.NavigateTo("/floors/" + TotalPages);
+            return;
+        }
+
+        floors = await context.Floors
+            .Include(f => f.FloorKeypads)
+            .Include(f => f.RequiredfloorRequiredfloorNavigations)
+            .Include(f => f.Outcomes)
+            .OrderBy(f => f.Id)
+            .Skip((CurrentPage.Value - 1) * ItemsPerPage)
+            .Take(ItemsPerPage)
+            .ToListAsync();
+    }
+}

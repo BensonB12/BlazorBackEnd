@@ -7,9 +7,9 @@ public partial class Shape
 {
     public int Id { get; set; }
 
-    public string? Title { get; set; }
+    public string Title { get; set; } = null!;
 
-    public int? Numsides { get; set; }
+    public int Numsides { get; set; }
 
     public virtual ICollection<Button> Buttons { get; set; } = new List<Button>();
 

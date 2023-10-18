@@ -11,15 +11,11 @@ public partial class Display
 
     public int? Proportion { get; set; }
 
-    public int? BtnId { get; set; }
-
     public int? ShapeId { get; set; }
 
     public int? ColorId { get; set; }
 
     public int? FontId { get; set; }
-
-    public virtual Button? Btn { get; set; }
 
     public virtual Color? Color { get; set; }
 
@@ -27,7 +23,7 @@ public partial class Display
 
     public virtual Font? Font { get; set; }
 
-    public virtual ICollection<Padlock> Padlocks { get; set; } = new List<Padlock>();
+    public virtual ICollection<Keypad> Keypads { get; set; } = new List<Keypad>();
 
     public virtual Shape? Shape { get; set; }
 }
