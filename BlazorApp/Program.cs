@@ -1,10 +1,13 @@
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
 using BlazorApp.Data;
 using BlazorApp.Shared;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 using BlazorApp.Data.DbModel;
+
+
+//public class Constants() { };
+
+
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
@@ -17,6 +20,13 @@ builder.Services.AddDbContextFactory<DbBensonbird25Context>(
     opt => opt.UseNpgsql(
         builder.Configuration.GetConnectionString("db_string")
         ));
+//builder.Services.AddDbContext<ApplicationDbContext>(config => config.UseNpgsql());
+
+/*builder.Services.AddIdentity<IdentityUser, IdentityRole>(options => options.SignIn.)
+    .AddDefaultTokenProviders()
+    .AddDefaultUI()
+    .AddEntityFr*/
+//builder.Services.AddHostedService<DefualtUserService>();
 builder.Services.AddRazorPages().AddJsonOptions(x => x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
 
 var app = builder.Build();
@@ -45,6 +55,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapBlazorHub();
 app.MapFallbackToPage("/_Host");
