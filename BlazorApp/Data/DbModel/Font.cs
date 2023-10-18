@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BlazorApp.DB_Data;
+namespace BlazorApp.Data.DbModel;
 
 public partial class Font
 {

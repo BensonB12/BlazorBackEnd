@@ -1,8 +1,5 @@
 ﻿@page "/floors"
-@using BlazorApp.Data
-@using BlazorApp.DB_Data
-@using Microsoft.EntityFrameworkCore;
-@inject DbBensonbird25Context Context
+@inject IDbContextFactory<DbBensonbird25Context> ContextFactory
 
 <PageTitle>Floors</PageTitle>
 
@@ -38,6 +35,8 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        floors = await Context.Floors.ToListAsync();
+        using var context = ContextFactory.CreateDbContext();
+
+        floors = await context.Floors.ToListAsync(); //.Include (f => f.padlock.....)
     }
 }

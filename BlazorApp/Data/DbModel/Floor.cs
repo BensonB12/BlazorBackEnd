@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace BlazorApp.DB_Data;
+namespace BlazorApp.Data.DbModel;
 
 public partial class Floor
 {
@@ -12,4 +12,5 @@ public partial class Floor
     public virtual ICollection<RequiredFloor> RequiredFloorChosenFloors { get; set; } = new List<RequiredFloor>();
 
     public virtual ICollection<RequiredFloor> RequiredFloorRequiredFloorNavigations { get; set; } = new List<RequiredFloor>();
+    public virtual ICollection<Outcome> Outcomes { get; set; } = new List<Outcome>();
 }

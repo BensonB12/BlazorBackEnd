@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace BlazorApp.DB_Data;
+namespace BlazorApp.Data.DbModel;
 
 public partial class DbBensonbird25Context : DbContext
 {
@@ -274,6 +275,27 @@ public partial class DbBensonbird25Context : DbContext
             entity.Property(e => e.Title)
                 .HasMaxLength(50)
                 .HasColumnName("title");
+        });
+
+        modelBuilder.Entity<Outcome>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("outcome_pkey");
+
+            entity.ToTable("outcome", "game234");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.FloorPadlockId).HasColumnName("floor_padlock_id");
+            entity.Property(e => e.FloorId).HasColumnName("floor_id");
+
+            entity.HasOne(d => d.Floor).WithMany(p => p.Outcomes)
+                .HasForeignKey(d => d.FloorId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("outcome_floor_id_fkey");
+
+            entity.HasOne(d => d.FloorPadlock).WithMany(p => p.Outcomes)
+                .HasForeignKey(d => d.FloorPadlockId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("outcome_floor_padlock_id_fkey");
         });
 
         OnModelCreatingPartial(modelBuilder);

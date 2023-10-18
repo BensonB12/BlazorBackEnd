@@ -1,7 +1,7 @@
-﻿<div class="top-row ps-3 navbar" style="background: lightgrey">
-    <div class="container-fluid">
-        <a>
-            <img src="Floor234_Logo.png" alt="Floor234" width="150"/>
+﻿<div class="top-row ps-3 navbar bg-lightgrey">
+    <div class="container-fluid justify-content-center">
+        <a class="navbar-brand">
+            <img src="Floor234_Logo.png" alt="Floor234" class="logo"/>
         </a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
             <span class="navbar-toggler-icon"></span>
@@ -9,16 +9,18 @@
     </div>
 </div>
 
-<div class="@NavMenuCssClass nav-scrollable" style="background: silver" @onclick="ToggleNavMenu">
+<div class="@NavMenuCssClass nav-scrollable bg-silver" @onclick="ToggleNavMenu">
     <nav class="flex-column">
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" style="color: black" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true" style="color: black"></span> Home
+            <NavLink class="nav-link black-fill-cascade" href="" Match="NavLinkMatch.All">
+                <span class="oi oi-home" aria-hidden="true"></span> 
+                <div>Home</div>
             </NavLink>
         </div>
-        <div class="nav-item px-3" >
-            <NavLink class="nav-link" href="Floors" style="color: black">
-                <span class="oi oi-aperture" aria-hidden="true" style="color: black"></span> Floors
+        <div class="nav-item px-3">
+            <NavLink class="nav-link black-fill-cascade" href="Floors">
+                <span class="oi oi-grid-three-up" aria-hidden="true"></span> 
+                <div>Floors</div>
             </NavLink>
         </div>
     </nav>
