@@ -13,7 +13,6 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorPages();
 builder.Services.AddHttpClient();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
 builder.Services.AddSingleton<FloorService>();
 builder.Services.AddScoped<CounterState>();
 builder.Services.AddDbContextFactory<DbBensonbird25Context>(
